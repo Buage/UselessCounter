@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
-const hyperswarm = require('hyperswarm');
+const hyperswarmPkg = require('hyperswarm')
+const hyperswarm = hyperswarmPkg.default || hyperswarmPkg
 const crypto = require('crypto')
 const websocket = require('ws');
 const port = 4729;
