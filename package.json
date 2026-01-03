@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "dependencies": {
-        "hyperswarm": "2.3.0",
+        "hyperswarm": "4.16.0",
         "ws": "^8.13.0"
     }
 }
