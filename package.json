@@ -1,0 +1,9 @@
+{
+    "name": "the-useless-clicker",
+    "version": "1.0.0",
+    "main": "index.js",
+    "dependencies": {
+        "hyperswarm": "^2.3.0",
+        "ws": "^8.13.0"
+    }
+}

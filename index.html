@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The useless clicker</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+    body.dark {
+        --color-text-main: #c4c4c4;
+        --color-text-secondary: #999999;
+        --color-bg-body: #111111;
+        --color-bg-card: #1A1A1A;
+        --color-border-card: #303030;
+        --color-shadow: #0000008c;
+        --color-divider: #ffffff21;
+        --color-button-bg: #252525;
+        --color-button-text: #a8a8a8;
+        --color-button-border: #343434;
+        --color-card-inside: #262626;
+    }
+
+    body {
+        --color-text-main: #DCDCDC;
+        --color-text-secondary: #A6A6A6;
+        --color-bg-body: #0D0D0D;
+        --color-bg-card: #1A1A1A;
+        --color-border-card: #303030;
+        --color-shadow: #2525258c;
+        --color-divider: #ffffff21;
+        --color-button-bg: #FEFEFE;
+        --color-button-text: #0D0D0D;
+        --color-button-border: #C7C7C7;
+        --color-card-inside: #262626;
+    }
+
+    body {
+        background-color: var(--color-bg-body);
+    }
+
+    button,
+    .button {
+        background-color: var(--color-button-bg);
+        color: var(--color-button-text);
+        border: 1px solid var(--color-button-border);
+        box-shadow: 0px 5px 10px var(--color-shadow);
+        padding: 10px 20px;
+        font-size: 16px;
+        width: 150px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    h3 {
+        color: var(--color-text-main);
+        font-family: 'Montserrat', sans-serif;
+        margin: 0;
+    }
+
+    p {
+        color: var(--color-text-secondary);
+        font-family: 'Montserrat', sans-serif;
+        margin: 0;
+    }
+
+
+    .card {
+        padding: 30px;
+        background-color: var(--color-bg-card);
+        border: 1px solid var(--color-border-card);
+        box-shadow: 1px 1px 5px var(--color-shadow);
+        border-radius: 14px;
+    }
+
+    .header {
+        display: flex;
+        gap: 20px;
+        flex-direction: column;
+        gap: 0;
+        justify-content: center;
+        align-self: center;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        min-height: 94vh;
+    }
+
+    .upgrades-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 600px;
+        height: 150px;
+        position: absolute;
+        bottom: 20px;
+        padding: 20px;
+        background-color: var(--color-card-inside);
+    }
+
+    .upgrade {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 110px;
+        width: 150px;
+        padding: 10px;
+        background-color: var(--color-bg-card);
+        border-bottom: 1px solid var(--color-divider);
+    }
+
+    .footer {
+        position: absolute;
+        bottom: 0;
+        width: 50%;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--color-bg-card);
+        border-top: 1px solid var(--color-divider);
+        box-shadow: 0px -5px 10px var(--color-shadow);
+    }
+</style>
+<body class="dark">
+    <div class="wrapper">
+        <div class="header card">
+            <h3>Welcome to the useless clicker!</h3>
+            <p>Click the button below to increase your clicks and get upgrades!</p>
+        </div>
+
+        <p id="click-count">Clicks: 0</p>
+
+        <button id="clicker-button" class="button">Click me!</button>
+
+        <div class="upgrades-container">
+            <h3>Upgrades</h3>
+        </div>
+
+        <div class="footer">
+            <p>Current peers: 0</p>
+            <p>Directly connected peers: 0</p>
+        </div>
+
+        <script>
+            let clickCount = 0;
+            let enableUpgrades = false;
+            let ws = new WebSocket(`ws://${location.host}`);
+
+            const clickCountElement = document.getElementById('click-count');
+            const clickerButton = document.getElementById('clicker-button');
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                document.querySelector('.footer').innerHTML = `
+                    <p>Current peers: ${data.peers}</p>
+                    <p>Directly connected peers: ${data.direct}</p>
+                `;
+
+                clickCountElement.textContent = `Clicks: ${data.total}`;
+                clickCount = data.total;
+            };
+
+            clickerButton.addEventListener('click', () => {
+                clickCount++;
+                clickCountElement.textContent = `Clicks: ${clickCount}`;
+
+                fetch('/clicks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: 1
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Server response:', data);
+                })
+                .catch(error => {
+                    console.error('Error communicating with server:', error);
+                });
+            });
+
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', () => {
+                    button.style.transform = `scale(${1 + Math.random() * 0.5}) rotate(${-15 + Math.random() * 30}deg)`;
+                });
+            });
+
+            if (enableUpgrades) {
+                document.querySelector('.upgrades-container').style.display = 'flex';
+            } else {
+                document.querySelector('.upgrades-container').style.display = 'none';
+            }
+        </script>
+    </div>
+</body>
+</html>

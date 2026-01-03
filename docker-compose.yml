@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  clicker:
+    build: .
+    container_name: useless-clicker
+    ports:
+      - "4729:4729"
+    restart: unless-stopped
