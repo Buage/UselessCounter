@@ -4,7 +4,8 @@ const hyperswarmPkg = require('hyperswarm')
 const hyperswarm = hyperswarmPkg.default || hyperswarmPkg
 const crypto = require('crypto')
 const websocket = require('ws');
-const port = 4729;
+
+const port = process.env.PORT || 4729
 
 const swarm = new hyperswarm();
 const topic = crypto
